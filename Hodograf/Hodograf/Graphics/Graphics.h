@@ -34,15 +34,14 @@ public:
 private:
 	bool InitializeDirectX(HWND hwnd);
 	bool InitializeShaders();
-	void GetFrame(Vector3 lb, Vector3 ub, vector<VertexP>& vertices, vector<int>& indices);
-	void InitBox();
+	void InitSquare();
 
 	bool InitializeScene();
 	void InitGui(HWND hwnd);
 	void RendeGui();
 	void RenderMainPanel();
 	void RenderVisualisation();
-	void RenderFrame(VertexBuffer<VertexP>& vb, IndexBuffer& ib, Vector4 color, Matrix matrix);
+	void RenderSquare(Vector4 color, Matrix matrix);
 
 	ComPtr<ID3D11Device> device;
 	ComPtr<ID3D11DeviceContext> deviceContext;
@@ -54,8 +53,8 @@ private:
 
 	ConstantBuffer<ColoredObjectBuffer> cbColoredObject;
 
-	VertexBuffer<VertexPT3>  vbModel;
-	IndexBuffer ibModel;
+	VertexBuffer<VertexP> vbSquare;
+	IndexBuffer ibSquare;
 
 	ComPtr<ID3D11DepthStencilView> depthStencilView;
 	ComPtr<ID3D11Texture2D> depthStencilBuffer;

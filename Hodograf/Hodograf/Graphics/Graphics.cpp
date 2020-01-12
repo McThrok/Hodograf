@@ -82,8 +82,7 @@ void Graphics::RenderMainPanel() {
 void Graphics::RenderVisualisation()
 {
 	this->deviceContext->IASetInputLayout(this->vertexshader.GetInputLayout());
-	//this->deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	this->deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	this->deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	this->deviceContext->RSSetState(this->rasterizerState.Get());
 	this->deviceContext->OMSetDepthStencilState(this->depthStencilState.Get(), 0);
 	this->deviceContext->VSSetShader(vertexshader.GetShader(), NULL, 0);
@@ -92,10 +91,11 @@ void Graphics::RenderVisualisation()
 	this->deviceContext->VSSetConstantBuffers(0, 1, this->cbColoredObject.GetAddressOf());
 	this->deviceContext->PSSetConstantBuffers(0, 1, this->cbColoredObject.GetAddressOf());
 
+	Matrix mBase = Matrix::CreateRotationX(XM_PIDIV2);
+		RenderSquare({ 0.8f ,0.8f ,0.8f ,1 }, mBase);
 
-	//if (guiData->showBox) RenderFrame(vbBox, ibBox, { 0.8f ,0.8f ,0.8f ,1 }, Matrix::Identity);
 }
-void Graphics::RenderFrame(VertexBuffer<VertexP>& vb, IndexBuffer& ib, Vector4 color, Matrix matrix)
+void Graphics::RenderSquare(Vector4 color, Matrix matrix)
 {
 	UINT offset = 0;
 
@@ -104,9 +104,9 @@ void Graphics::RenderFrame(VertexBuffer<VertexP>& vb, IndexBuffer& ib, Vector4 c
 	cbColoredObject.data.color = color;
 
 	if (!cbColoredObject.ApplyChanges()) return;
-	deviceContext->IASetVertexBuffers(0, 1, vb.GetAddressOf(), vb.StridePtr(), &offset);
-	deviceContext->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
-	deviceContext->DrawIndexed(ib.BufferSize(), 0, 0);
+	deviceContext->IASetVertexBuffers(0, 1, vbSquare.GetAddressOf(), vbSquare.StridePtr(), &offset);
+	deviceContext->IASetIndexBuffer(ibSquare.Get(), DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->DrawIndexed(ibSquare.BufferSize(), 0, 0);
 }
 
 bool Graphics::InitializeDirectX(HWND hwnd)
@@ -259,43 +259,35 @@ bool Graphics::InitializeShaders()
 	return true;
 }
 
-void Graphics::GetFrame(Vector3 lb, Vector3 ub, vector<VertexP>& vertices, vector<int>& indices)
+void Graphics::InitSquare()
 {
-	vertices = {
-		VertexP(lb.x,lb.y,lb.z),
-		VertexP(ub.x,lb.y,lb.z),
-		VertexP(lb.x,ub.y,lb.z),
-		VertexP(ub.x,ub.y,lb.z),
-
-		VertexP(lb.x,lb.y,ub.z),
-		VertexP(ub.x,lb.y,ub.z),
-		VertexP(lb.x,ub.y,ub.z),
-		VertexP(ub.x,ub.y,ub.z),
-	};
-
-	indices =
+	VertexP v[] =
 	{
-		0,1,2,3,0,2,1,3,
-		4,5,6,7,4,6,5,7,
-		0,4,1,5,2,6,3,7
+		{-0.5f,  -0.5f, 0.0f},
+		{-0.5f,   0.5f, 0.0f},
+		{0.5f ,   0.5f,  0.0f},
+		{0.5f ,  -0.5f,  0.0f},
 	};
-}
-void Graphics::InitBox()
-{
-	vector<VertexP> vertices;
-	vector<int> indices;
 
-	//..
+	this->vbSquare.Initialize(this->device.Get(), v, ARRAYSIZE(v));
 
-	//HRESULT hr = this->vbBox.Initialize(this->device.Get(), vertices.data(), vertices.size());
-	//if (FAILED(hr))
-	//	ErrorLogger::Log(hr, "Failed to create vertex buffer.");
+	int indices[] =
+	{
+		0, 1, 2,
+		0, 2, 3
+	};
 
-	//hr = this->ibBox.Initialize(this->device.Get(), indices.data(), indices.size());
-	//if (FAILED(hr))
-	//	ErrorLogger::Log(hr, "Failed to create indices buffer.");
+	this->ibSquare.Initialize(this->device.Get(), indices, ARRAYSIZE(indices));
+
 }
 bool Graphics::InitializeScene()
 {
+	InitSquare();
+
+	cbColoredObject.Initialize(device.Get(), deviceContext.Get());
+
+	camera.SetPosition(0, -3, 0);
+	camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f);
+
 	return true;
 }
