@@ -80,18 +80,18 @@ void Graphics::RenderMainPanel() {
 	ImGui::SliderFloat("R", &simulation->R, 1, 20, "%.4f");
 	ImGui::SliderFloat("w", &simulation->omega, 0, 3.14, "%.4f");
 	ImGui::SliderFloat("e0", &simulation->e0, 0, 0.1, "%.4f");
-	ImGui::SliderFloat("delta time", &simulation->delta_time, 0.0005f, 0.05f, "%.4f");
+	ImGui::SliderFloat("delta time", &simulation->delta_time, 0.01f, 0.05f, "%.4f");
 	ImGui::SliderFloat("simulation speed", &simulation->simulationSpeed, 0.1, 10);
 
 	ImGui::Separator();
-	ImGui::DragFloat2("min position", &simulation->minX.x);
-	ImGui::DragFloat2("max position", &simulation->maxX.x);
-	ImGui::DragFloat2("min velocity", &simulation->minXt.x);
-	ImGui::DragFloat2("max velocity", &simulation->maxXt.x);
-	ImGui::DragFloat2("min acceleration", &simulation->minXtt.x);
-	ImGui::DragFloat2("max acceleration", &simulation->maxXtt.x);
-	ImGui::DragFloat2("min state", &simulation->minState.x);
-	ImGui::DragFloat2("max state", &simulation->maxState.x);
+	ImGui::DragFloat2("min position", &simulation->minX.x,0.1f);
+	ImGui::DragFloat2("max position", &simulation->maxX.x, 0.1f);
+	ImGui::DragFloat2("min velocity", &simulation->minXt.x, 0.1f);
+	ImGui::DragFloat2("max velocity", &simulation->maxXt.x, 0.1f);
+	ImGui::DragFloat2("min acceleration", &simulation->minXtt.x, 0.1f);
+	ImGui::DragFloat2("max acceleration", &simulation->maxXtt.x, 0.1f);
+	ImGui::DragFloat2("min state", &simulation->minState.x, 0.1f);
+	ImGui::DragFloat2("max state", &simulation->maxState.x, 0.1f);
 
 	ImGui::End();
 }
