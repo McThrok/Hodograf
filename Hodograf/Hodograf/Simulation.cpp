@@ -4,13 +4,25 @@ void Simulation::Init()
 {
 	time = 0;
 	simulationSpeed = 1;
-	delta_time = 0.001;
+	delta_time = 0.01;
 
 	omega = 0.1;
 	alpha = 0;
-	R = 5;
+	R = 3;
 	L = 10;
 	e0 = 0.01;
+
+	minX = { 0,-5 };
+	maxX = { 100,5 };
+
+	minXt = { 0,-5 };
+	maxXt = { 100,5 };
+
+	minXtt = { 0,-5 };
+	maxXtt = { 100,5 };
+
+	minState = { -5,-5 };
+	maxState = { 5,5 };
 
 	Reset();
 	paused = false;
@@ -24,14 +36,17 @@ void Simulation::Reset()
 	x.clear();
 	xt.clear();
 	xtt.clear();
+	state.clear();
 
-	x.push_back(R + L);
-	xt.push_back(0);
-	xtt.push_back(0);
+	x.push_back(ImVec2(0, R + L));
+	xt.push_back(ImVec2(0, 0));
+	xtt.push_back(ImVec2(0, 0));
+	state.push_back(ImVec2(x[0].y, xt[0].y));
 
-	x.push_back(R + L);
-	xt.push_back(0);
-	xtt.push_back(0);
+	x.push_back(ImVec2(delta_time, R + L));
+	xt.push_back(ImVec2(delta_time, 0));
+	xtt.push_back(ImVec2(delta_time, 0));
+	state.push_back(ImVec2(x[1].y, xt[1].y));
 }
 
 void Simulation::Update(float dt)
@@ -57,11 +72,14 @@ void Simulation::Update()
 	while (alpha > 2 * XM_PI) alpha -= 2 * XM_PI;
 
 	float sa = sinf(alpha);
-	x.push_back(cosf(alpha) * R + sqrtf(disturbed_L * disturbed_L - sa * sa * R * R));
-	xt.push_back((x[x.size() - 1] - x[x.size() - 2]) / (2 * delta_time));
-	xtt.push_back((xt[xt.size() - 1] - xt[xt.size() - 2]) / (2 * delta_time));
-}
+	int count = x.size();
+	float time = x[count - 1].x + delta_time;
 
+	x.push_back(ImVec2(time,cosf(alpha) * R + sqrtf(disturbed_L * disturbed_L - sa * sa * R * R)));
+	xt.push_back(ImVec2(time,(x[count - 1].y - x[count - 2].y) / (2 * delta_time) ));
+	xtt.push_back(ImVec2(time,(xt[count - 1].y - xt[count - 2].y) / (2 * delta_time)));
+	state.push_back(ImVec2(x[count - 1].y, xt[count - 1].y));
+}
 
 void Simulation::DisturbL()
 {

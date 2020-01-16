@@ -45,13 +45,17 @@ void Graphics::RendeGui() {
 	ImGui::NewFrame();
 
 	RenderMainPanel();
+	RenderPositionChart();
+	RenderVelocityChart();
+	RenderAccelerationChart();
+	RenderStateChart();
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 void Graphics::RenderMainPanel() {
-	ImGui::SetNextWindowSize(ImVec2(400, 600), ImGuiCond_Once);
-	ImGui::SetNextWindowPos(ImVec2(10, 30), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(400, 380), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Once);
 	if (!ImGui::Begin("Main Panel"))
 	{
 		ImGui::End();
@@ -77,11 +81,83 @@ void Graphics::RenderMainPanel() {
 	ImGui::SliderFloat("w", &simulation->omega, 0, 3.14, "%.4f");
 	ImGui::SliderFloat("e0", &simulation->e0, 0, 0.1, "%.4f");
 	ImGui::SliderFloat("delta time", &simulation->delta_time, 0.0005f, 0.05f, "%.4f");
-
-	ImGui::Separator();
 	ImGui::SliderFloat("simulation speed", &simulation->simulationSpeed, 0.1, 10);
 
+	ImGui::Separator();
+	ImGui::DragFloat2("min position", &simulation->minX.x);
+	ImGui::DragFloat2("max position", &simulation->maxX.x);
+	ImGui::DragFloat2("min velocity", &simulation->minXt.x);
+	ImGui::DragFloat2("max velocity", &simulation->maxXt.x);
+	ImGui::DragFloat2("min acceleration", &simulation->minXtt.x);
+	ImGui::DragFloat2("max acceleration", &simulation->maxXtt.x);
+	ImGui::DragFloat2("min state", &simulation->minState.x);
+	ImGui::DragFloat2("max state", &simulation->maxState.x);
+
 	ImGui::End();
+}
+void Graphics::RenderPositionChart()
+{
+	ImGui::SetNextWindowSize(ImVec2(1470, 220), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(420, 310), ImGuiCond_Once);
+	if (!ImGui::Begin("position"))
+	{
+		ImGui::End();
+		return;
+	}
+
+	auto data = ChartData(&(simulation->x), IM_COL32(200, 0, 0, 255));
+	MyImGui::DrawChart({ data }, simulation->minX, simulation->maxX);
+
+	ImGui::End();
+
+}
+void Graphics::RenderVelocityChart()
+{
+	ImGui::SetNextWindowSize(ImVec2(1470, 220), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(420, 540), ImGuiCond_Once);
+	if (!ImGui::Begin("velocity"))
+	{
+		ImGui::End();
+		return;
+	}
+
+	auto data = ChartData(&(simulation->xt), IM_COL32(200, 0, 0, 255));
+	MyImGui::DrawChart({ data }, simulation->minXt, simulation->maxXt);
+
+	ImGui::End();
+
+}
+void Graphics::RenderAccelerationChart()
+{
+	ImGui::SetNextWindowSize(ImVec2(1470, 220), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(420, 770), ImGuiCond_Once);
+	if (!ImGui::Begin("acceleration"))
+	{
+		ImGui::End();
+		return;
+	}
+
+	auto data = ChartData(&(simulation->xtt), IM_COL32(200, 0, 0, 255));
+	MyImGui::DrawChart({ data }, simulation->minXtt, simulation->maxXtt);
+
+	ImGui::End();
+
+}
+void Graphics::RenderStateChart()
+{
+	ImGui::SetNextWindowSize(ImVec2(400, 590), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(10, 400), ImGuiCond_Once);
+	if (!ImGui::Begin("state"))
+	{
+		ImGui::End();
+		return;
+	}
+
+	auto data = ChartData(&(simulation->state), IM_COL32(200, 0, 0, 255));
+	MyImGui::DrawChart({ data }, simulation->minState, simulation->maxState);
+
+	ImGui::End();
+
 }
 void Graphics::RenderVisualisation()
 {
@@ -95,14 +171,10 @@ void Graphics::RenderVisualisation()
 	this->deviceContext->VSSetConstantBuffers(0, 1, this->cbColoredObject.GetAddressOf());
 	this->deviceContext->PSSetConstantBuffers(0, 1, this->cbColoredObject.GetAddressOf());
 
-	//Matrix mBase = Matrix::CreateRotationX(XM_PIDIV2);
 	vector<Matrix> matrices = GetMatrices();
 	RenderSquare({ 0.8f ,0.8f ,0.8f ,1 }, matrices[0]);
 	RenderSquare({ 0.8f ,0.8f ,0.8f ,1 }, matrices[1]);
 	RenderSquare({ 0.8f ,0.8f ,0.8f ,1 }, matrices[2]);
-
-
-
 }
 void Graphics::RenderSquare(Vector4 color, Matrix matrix)
 {
@@ -295,7 +367,7 @@ bool Graphics::InitializeScene()
 
 	cbColoredObject.Initialize(device.Get(), deviceContext.Get());
 
-	camera.SetPosition(5, -10, 0);
+	camera.SetPosition(5, -10, -5);
 	camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f);
 
 	return true;
@@ -308,14 +380,13 @@ vector<Matrix> Graphics::GetMatrices()
 	float a = simulation->alpha;
 	float r = simulation->R;
 	float l = simulation->disturbed_L;
-	float x = simulation->x[simulation->x.size() - 1];
+	float x = simulation->x[simulation->x.size() - 1].y;
 
 	Matrix mBase = Matrix::CreateRotationX(XM_PIDIV2) * Matrix::CreateTranslation(0.5, 0, 0);
 	result[0] = mBase * Matrix::CreateScale(r, 1, armWidth) * Matrix::CreateRotationY(a);
-	float b = XM_PIDIV2 - atan2f( x - cosf(a) * r, sinf(a) * r);
+	float b = XM_PIDIV2 - atan2f(x - cosf(a) * r, sinf(a) * r);
 	result[1] = mBase * Matrix::CreateScale(l, 1, armWidth) * Matrix::CreateRotationY(-b) * Matrix::CreateTranslation(cosf(a) * r, 0, sinf(-a) * r);
-	result[2] = mBase * Matrix::CreateTranslation(simulation->x[simulation->x.size() - 1], 0, 0);
-
+	result[2] = mBase * Matrix::CreateTranslation(x, 0, 0);
 
 	return result;
 }

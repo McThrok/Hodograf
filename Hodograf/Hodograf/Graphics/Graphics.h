@@ -40,6 +40,10 @@ private:
 	void InitGui(HWND hwnd);
 	void RendeGui();
 	void RenderMainPanel();
+	void RenderPositionChart();
+	void RenderVelocityChart();
+	void RenderAccelerationChart();
+	void RenderStateChart();
 	void RenderVisualisation();
 	void RenderSquare(Vector4 color, Matrix matrix);
 	vector<Matrix> GetMatrices();

@@ -18,5 +18,5 @@ public:
 
 class MyImGui {
 public:
-	static void DrawChart(std::vector<ChartData> data, ImVec2 min_range, ImVec2 max_range);
+	static void DrawChart(vector<ChartData> data, ImVec2 min_range, ImVec2 max_range);
 };

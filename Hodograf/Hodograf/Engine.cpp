@@ -51,14 +51,14 @@ void Engine::Update()
 	//}
 
 	const float cameraSpeed = 0.006f;
-	/*if (keyboard.KeyIsPressed('W'))
+	if (keyboard.KeyIsPressed('W'))
 	{
 		this->gfx.camera.AdjustPosition(this->gfx.camera.GetForwardVector() * cameraSpeed * dt);
 	}
 	if (keyboard.KeyIsPressed('S'))
 	{
 		this->gfx.camera.AdjustPosition(this->gfx.camera.GetBackwardVector() * cameraSpeed * dt);
-	}*/
+	}
 	if (keyboard.KeyIsPressed('A'))
 	{
 		this->gfx.camera.AdjustPosition(this->gfx.camera.GetLeftVector() * cameraSpeed * dt);
@@ -67,11 +67,11 @@ void Engine::Update()
 	{
 		this->gfx.camera.AdjustPosition(this->gfx.camera.GetRightVector() * cameraSpeed * dt);
 	}
-	if (keyboard.KeyIsPressed('W'))
+	if (keyboard.KeyIsPressed('Q'))
 	{
 		this->gfx.camera.AdjustPosition(0.0f, 0.0f, cameraSpeed * dt);
 	}
-	if (keyboard.KeyIsPressed('S'))
+	if (keyboard.KeyIsPressed('E'))
 	{
 		this->gfx.camera.AdjustPosition(0.0f, 0.0f, -cameraSpeed * dt);
 	}

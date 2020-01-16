@@ -6,6 +6,7 @@
 #include <SimpleMath.h>
 #include "Graphics/Vertex.h"
 #include <random>
+#include "Graphics/MyImGui.h"
 
 using namespace std;
 using namespace DirectX;
@@ -21,11 +22,17 @@ public:
 
 	float simulationSpeed;
 
-	vector<float> x;
-	vector<float> xt;
-	vector<float> xtt;
+	vector<ImVec2> x;
+	vector<ImVec2> xt;
+	vector<ImVec2> xtt;
+	vector<ImVec2> state;
 
-	float omega, L, R, alpha, disturbed_L,e0;
+	ImVec2 minX, maxX;
+	ImVec2 minXt, maxXt;
+	ImVec2 minXtt, maxXtt;
+	ImVec2 minState, maxState;
+
+	float omega, L, R, alpha, disturbed_L, e0;
 
 	mt19937 gen{ std::random_device{}() };
 
