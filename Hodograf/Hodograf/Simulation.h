@@ -33,6 +33,7 @@ public:
 	ImVec2 minState, maxState;
 
 	float omega, L, R, alpha, disturbed_L, e0;
+	int diffOffset = 1;
 
 	mt19937 gen{ std::random_device{}() };
 

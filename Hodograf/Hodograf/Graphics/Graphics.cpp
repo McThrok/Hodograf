@@ -54,7 +54,7 @@ void Graphics::RendeGui() {
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 void Graphics::RenderMainPanel() {
-	ImGui::SetNextWindowSize(ImVec2(400, 380), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(400, 410), ImGuiCond_Once);
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Once);
 	if (!ImGui::Begin("Main Panel"))
 	{
@@ -81,7 +81,8 @@ void Graphics::RenderMainPanel() {
 	ImGui::SliderFloat("w", &simulation->omega, 0, 3.14, "%.4f");
 	ImGui::SliderFloat("e0", &simulation->e0, 0, 0.1, "%.4f");
 	ImGui::SliderFloat("delta time", &simulation->delta_time, 0.01f, 0.05f, "%.4f");
-	ImGui::SliderFloat("simulation speed", &simulation->simulationSpeed, 0.1, 10);
+	ImGui::SliderFloat("simulation speed", &simulation->simulationSpeed, 0, 10);
+	ImGui::SliderInt("diff offset", &simulation->diffOffset, 1,10);
 
 	ImGui::Separator();
 	ImGui::DragFloat2("min position", &simulation->minX.x,0.1f);
@@ -145,8 +146,8 @@ void Graphics::RenderAccelerationChart()
 }
 void Graphics::RenderStateChart()
 {
-	ImGui::SetNextWindowSize(ImVec2(400, 590), ImGuiCond_Once);
-	ImGui::SetNextWindowPos(ImVec2(10, 400), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(400, 560), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(10, 430), ImGuiCond_Once);
 	if (!ImGui::Begin("state"))
 	{
 		ImGui::End();

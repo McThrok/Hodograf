@@ -6,7 +6,7 @@ void Simulation::Init()
 	simulationSpeed = 1;
 	delta_time = 0.03;
 
-	omega = 3.14;
+	omega = 3.14/2;
 	alpha = 0;
 	R = 3;
 	L = 10;
@@ -15,14 +15,14 @@ void Simulation::Init()
 	minX = { 0,5 };
 	maxX = { 50,15 };
 
-	minXt = { 0,-1 };
-	maxXt = { 50,1 };
+	minXt = { 0,-10 };
+	maxXt = { 50,10 };
 
-	minXtt = { 0,-1 };
-	maxXtt = { 50,1 };
+	minXtt = { 0,-30 };
+	maxXtt = { 50,30 };
 
-	minState = { 5,-1 };
-	maxState = { 15,1 };
+	minState = { 5,-10 };
+	maxState = { 15,10 };
 
 	Reset();
 	paused = false;
@@ -69,35 +69,40 @@ void Simulation::Update()
 
 	x.push_back(ImVec2(time, cosf(alpha) * R + sqrtf(disturbed_L * disturbed_L - sa * sa * R * R)));
 
-	if (x.size() >= 9)
+	int d = diffOffset;
+	if (x.size() >= 9 * d)
 	{
 		int c = x.size();
 		xt.push_back(ImVec2(
-			x[c - 5].x,
-			x[c - 9].y / 280
-			- 4 * x[c - 8].y / 105
-			+ x[c - 7].y / 5
-			- 4 * x[c - 6].y / 5
-			+ 4 * x[c - 4].y / 5
-			- x[c - 3].y / 5
-			+ 4 * x[c - 2].y / 105
-			- x[c - 1].y / 280
+			x[c - 5 * d].x,
+			(
+				x[c - 9 * d].y / 280
+				- 4 * x[c - 8 * d].y / 105
+				+ x[c - 7 * d].y / 5
+				- 4 * x[c - 6 * d].y / 5
+				+ 4 * x[c - 4 * d].y / 5
+				- x[c - 3 * d].y / 5
+				+ 4 * x[c - 2 * d].y / 105
+				- x[c - 1 * d].y / 280
+				) / (delta_time * d)
 		));
 
 		xtt.push_back(ImVec2(
-			x[c - 5].x,
-			-x[c - 9].y / 560
-			+ 8 * x[c - 8].y / 325
-			- x[c - 7].y / 5
-			+ 8 * x[c - 6].y / 5
-			- 205 * x[c - 5].y / 72
-			+ 8 * x[c - 4].y / 5
-			- x[c - 3].y / 5
-			+ 8 * x[c - 2].y / 325
-			- x[c - 1].y / 560
+			x[c - 5 * d].x,
+			(
+				-x[c - 9 * d].y / 560
+				+ 8 * x[c - 8 * d].y / 315
+				- x[c - 7 * d].y / 5
+				+ 8 * x[c - 6 * d].y / 5
+				- 205 * x[c - 5 * d].y / 72
+				+ 8 * x[c - 4 * d].y / 5
+				- x[c - 3 * d].y / 5
+				+ 8 * x[c - 2 * d].y / 315
+				- x[c - 1 * d].y / 560
+				) /( delta_time * d * delta_time * d)
 		));
 
-		state.push_back(ImVec2(x[c - 5].y, xt[xt.size() - 1].y));
+		state.push_back(ImVec2(x[c - 5 * d].y, xt[xt.size() - 1].y));
 	}
 
 }
