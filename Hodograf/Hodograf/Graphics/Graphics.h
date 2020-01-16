@@ -42,6 +42,7 @@ private:
 	void RenderMainPanel();
 	void RenderVisualisation();
 	void RenderSquare(Vector4 color, Matrix matrix);
+	vector<Matrix> GetMatrices();
 
 	ComPtr<ID3D11Device> device;
 	ComPtr<ID3D11DeviceContext> deviceContext;

@@ -72,6 +72,10 @@ void Graphics::RenderMainPanel() {
 		simulation->Reset();
 	}
 
+	ImGui::SliderFloat("L", &simulation->L, 1, 20, "%.4f");
+	ImGui::SliderFloat("R", &simulation->R, 1, 20, "%.4f");
+	ImGui::SliderFloat("w", &simulation->omega, 0, 3.14, "%.4f");
+	ImGui::SliderFloat("e0", &simulation->e0, 0, 0.1, "%.4f");
 	ImGui::SliderFloat("delta time", &simulation->delta_time, 0.0005f, 0.05f, "%.4f");
 
 	ImGui::Separator();
@@ -91,8 +95,13 @@ void Graphics::RenderVisualisation()
 	this->deviceContext->VSSetConstantBuffers(0, 1, this->cbColoredObject.GetAddressOf());
 	this->deviceContext->PSSetConstantBuffers(0, 1, this->cbColoredObject.GetAddressOf());
 
-	Matrix mBase = Matrix::CreateRotationX(XM_PIDIV2);
-		RenderSquare({ 0.8f ,0.8f ,0.8f ,1 }, mBase);
+	//Matrix mBase = Matrix::CreateRotationX(XM_PIDIV2);
+	vector<Matrix> matrices = GetMatrices();
+	RenderSquare({ 0.8f ,0.8f ,0.8f ,1 }, matrices[0]);
+	RenderSquare({ 0.8f ,0.8f ,0.8f ,1 }, matrices[1]);
+	RenderSquare({ 0.8f ,0.8f ,0.8f ,1 }, matrices[2]);
+
+
 
 }
 void Graphics::RenderSquare(Vector4 color, Matrix matrix)
@@ -286,8 +295,27 @@ bool Graphics::InitializeScene()
 
 	cbColoredObject.Initialize(device.Get(), deviceContext.Get());
 
-	camera.SetPosition(0, -3, 0);
+	camera.SetPosition(5, -10, 0);
 	camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f);
 
 	return true;
+}
+
+vector<Matrix> Graphics::GetMatrices()
+{
+	vector<Matrix> result(3);
+	float armWidth = 0.3;
+	float a = simulation->alpha;
+	float r = simulation->R;
+	float l = simulation->disturbed_L;
+	float x = simulation->x[simulation->x.size() - 1];
+
+	Matrix mBase = Matrix::CreateRotationX(XM_PIDIV2) * Matrix::CreateTranslation(0.5, 0, 0);
+	result[0] = mBase * Matrix::CreateScale(r, 1, armWidth) * Matrix::CreateRotationY(a);
+	float b = XM_PIDIV2 - atan2f( x - cosf(a) * r, sinf(a) * r);
+	result[1] = mBase * Matrix::CreateScale(l, 1, armWidth) * Matrix::CreateRotationY(-b) * Matrix::CreateTranslation(cosf(a) * r, 0, sinf(-a) * r);
+	result[2] = mBase * Matrix::CreateTranslation(simulation->x[simulation->x.size() - 1], 0, 0);
+
+
+	return result;
 }

@@ -38,27 +38,27 @@ void Engine::Update()
 		unsigned char keycode = kbe.GetKeyCode();
 	}
 
-	while (!mouse.EventBufferIsEmpty())
-	{
-		MouseEvent me = mouse.ReadEvent();
-		if (mouse.IsRightDown())
-		{
-			if (me.GetType() == MouseEvent::EventType::RAW_MOVE)
-			{
-				this->gfx.camera.AdjustRotation(-(float)me.GetPosY() * 0.01f, 0, -(float)me.GetPosX() * 0.01f);
-			}
-		}
-	}
+	//while (!mouse.EventBufferIsEmpty())
+	//{
+	//	MouseEvent me = mouse.ReadEvent();
+	//	if (mouse.IsRightDown())
+	//	{
+	//		if (me.GetType() == MouseEvent::EventType::RAW_MOVE)
+	//		{
+	//			this->gfx.camera.AdjustRotation(-(float)me.GetPosY() * 0.01f, 0, -(float)me.GetPosX() * 0.01f);
+	//		}
+	//	}
+	//}
 
 	const float cameraSpeed = 0.006f;
-	if (keyboard.KeyIsPressed('W'))
+	/*if (keyboard.KeyIsPressed('W'))
 	{
 		this->gfx.camera.AdjustPosition(this->gfx.camera.GetForwardVector() * cameraSpeed * dt);
 	}
 	if (keyboard.KeyIsPressed('S'))
 	{
 		this->gfx.camera.AdjustPosition(this->gfx.camera.GetBackwardVector() * cameraSpeed * dt);
-	}
+	}*/
 	if (keyboard.KeyIsPressed('A'))
 	{
 		this->gfx.camera.AdjustPosition(this->gfx.camera.GetLeftVector() * cameraSpeed * dt);
@@ -67,11 +67,11 @@ void Engine::Update()
 	{
 		this->gfx.camera.AdjustPosition(this->gfx.camera.GetRightVector() * cameraSpeed * dt);
 	}
-	if (keyboard.KeyIsPressed('Q'))
+	if (keyboard.KeyIsPressed('W'))
 	{
 		this->gfx.camera.AdjustPosition(0.0f, 0.0f, cameraSpeed * dt);
 	}
-	if (keyboard.KeyIsPressed('E'))
+	if (keyboard.KeyIsPressed('S'))
 	{
 		this->gfx.camera.AdjustPosition(0.0f, 0.0f, -cameraSpeed * dt);
 	}
